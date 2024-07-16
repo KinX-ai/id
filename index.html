@@ -2,8 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Get Facebook Post IDs</title>
+    <title>Get Facebook Post ID</title>
     <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://img.upanh.tv/2024/07/16/imaged36b4974d434306c.png') no-repeat center center fixed;
+            background-size: cover;
+            position: relative; /* Ensure the container remains relative for absolute positioning of hearts */
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px; /* Điều chỉnh kích thước của container */
+            width: 100%;
+        }
+        .container h1 {
+            margin-bottom: 20px;
+            color: #3b5998; /* Màu sắc giống Facebook */
+            animation: rainbowText 3s infinite; /* Thêm hiệu ứng chữ 7 màu */
+        }
         @keyframes rainbowText {
             0% { color: red; }
             14% { color: orange; }
@@ -14,85 +39,34 @@
             85% { color: violet; }
             100% { color: red; }
         }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-100vh);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh);
-                opacity: 0;
-            }
-        }
-
-        @keyframes moveCat {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(100vw); }
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: url('https://img.upanh.tv/2024/07/16/imaged36b4974d434306c.png') no-repeat center center fixed;
-            background-size: cover;
-            overflow: hidden;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            margin: 10px;
-        }
-
-        .container h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            animation: rainbowText 3s infinite;
-        }
-
         .input-container {
             margin-bottom: 10px;
             text-align: left;
         }
-
         .input-container label {
             display: block;
             margin-bottom: 5px;
-            color: #3b5998;
+            text-align: left;
+            color: #3b5998; /* Màu sắc giống Facebook */
         }
-
         .input-container input {
             padding: 10px;
-            width: calc(100% - 22px);
+            width: calc(100% - 22px); /* Điều chỉnh chiều rộng input */
             border: 1px solid #ccc;
             border-radius: 5px;
-            margin-bottom: 10px;
         }
-
         button {
             margin-top: 10px;
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* Màu sắc giống Facebook */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-
         button:hover {
-            background-color: #45a049;
+            background-color: #45a049; /* Màu sắc giống Facebook */
         }
-
         .output {
             margin-top: 20px;
             text-align: center;
@@ -100,59 +74,75 @@
             border-radius: 5px;
             background-color: #f2f2f2;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            margin: 10px;
+        }
+        .output p {
+            margin: 5px 0;
+            font-size: 16px;
+            display: inline-block; /* Hiển thị các ID bài đăng trên cùng một hàng */
+            padding: 8px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+        .copy-button {
+            background-color: #007bff; /* Màu sắc giống Facebook */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+        .copy-button:hover {
+            background-color: #0056b3; /* Màu sắc giống Facebook */
+        }
+
+        /* Heart animation */
+        @keyframes heartFall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .heart {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            transform: rotate(-45deg);
-            animation: fall 5s linear infinite;
+            width: 20px;
+            height: 20px;
+            background-color: #ff6384;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: heartFall 6s linear infinite;
         }
 
-        .heart::before,
-        .heart::after {
-            content: "";
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            border-radius: 50%;
+        /* Popup notification */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(to right, #ffac81, #ff928b);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            display: none; /* Initially hidden */
+            z-index: 1000; /* Ensure it's above other content */
         }
 
-        .heart::before {
-            top: -5px;
-            left: 0;
-        }
-
-        .heart::after {
-            left: 5px;
-            top: 0;
-        }
-
-        .cat {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background-image: url('https://source.unsplash.com/50x50/?cat');
-            background-size: cover;
-            animation: moveCat 10s linear infinite;
-        }
-
-        .bottom {
-            bottom: 0;
-        }
-
-        .top {
-            top: 0;
+        .show-popup {
+            display: block; /* Show popup */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Vì Cậu Tớ Có Thể Làm Tất Cả</h1>
+        <h1>Get Facebook Post ID</h1>
         
         <div class="input-container">
             <label for="access-token">Access Token:</label>
@@ -174,12 +164,38 @@
         <div id="post-ids" class="output"></div>
     </div>
 
+    <!-- Container for hearts -->
+    <div id="heart-container"></div>
+
+    <!-- Popup notification -->
+    <div id="popup" class="popup"></div>
+
     <script>
-        async function getFacebookPostIds() {
+        // Function to create hearts randomly
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            document.getElementById('heart-container').appendChild(heart);
+
+            // Remove heart after animation ends
+            setTimeout(() => {
+                heart.remove();
+            }, 6000); // Adjust to match animation duration
+        }
+
+        // Trigger heart creation periodically
+        setInterval(() => {
+            createHeart();
+        }, 3000); // Adjust interval as needed
+
+        // Trigger heart creation on button click and fetch data
+        function getFacebookPostIds() {
             const pageId = document.getElementById('page-id').value;
             const limit = document.getElementById('post-limit').value || 10;
             const accessToken = document.getElementById('access-token').value;
 
+            // Validate inputs
             if (!pageId) {
                 alert('Please enter a Page ID');
                 return;
@@ -191,83 +207,66 @@
 
             const url = `https://graph.facebook.com/v16.0/${pageId}/posts?limit=${limit}&access_token=${accessToken}`;
 
-            try {
-                const response = await fetch(url);
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(`API error! message: ${data.error.message}`);
+                    }
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                    // Extract post IDs
+                    const postIds = data.data
+                        .map(post => post.id.split('_')[1])
+                        .filter(id => id);
 
-                const data = await response.json();
+                    const outputDiv = document.getElementById('post-ids');
+                    outputDiv.innerHTML = '';
 
-                if (data.error) {
-                    throw new Error(`API error! message: ${data.error.message}`);
-                }
+                    // Display post IDs
+                    postIds.forEach(id => {
+                        const p = document.createElement('p');
+                        p.textContent = id;
+                        outputDiv.appendChild(p);
+                    });
 
-                const postIds = data.data
-                    .map(post => post.id.split('_')[1])
-                    .filter(id => id);
+                    // Create "Copy All" button
+                    const copyAllButton = document.createElement('button');
+                    copyAllButton.textContent = 'Copy All';
+                    copyAllButton.className = 'copy-button';
+                    copyAllButton.style.marginTop = '10px';
+                    copyAllButton.addEventListener('click', () => {
+                        const allIds = postIds.join('\n');
+                        navigator.clipboard.writeText(allIds)
+                            .then(() => {
+                                // Show popup notification
+                                const popup = document.getElementById('popup');
+                                popup.textContent = 'Coppy Tất Cả  ID Thành Công';
+                                popup.classList.add('show-popup');
 
-                const outputDiv = document.getElementById('post-ids');
-                outputDiv.innerHTML = '';
+                                // Hide popup after a few seconds
+                                setTimeout(() => {
+                                    popup.classList.remove('show-popup');
+                                }, 3000);
+                            })
+                            .catch(err => {
+                                console.error('Error copying text:', err);
+                                alert('Failed to copy IDs');
+                            });
+                    });
 
-                postIds.forEach(id => {
-                    const p = document.createElement('p');
-                    p.textContent = id;
-                    outputDiv.appendChild(p);
+                    outputDiv.appendChild(copyAllButton);
+
+                })
+                .catch(error => {
+                    console.error('Error fetching posts:', error);
+                    outputDiv.innerText = `Error: ${error.message}`;
                 });
-
-                const copyAllButton = document.createElement('button');
-                copyAllButton.textContent = 'Copy All';
-                copyAllButton.className = 'copy-button';
-                copyAllButton.style.marginTop = '10px';
-                copyAllButton.addEventListener('click', () => {
-                    const allIds = postIds.join('\n');
-                    navigator.clipboard.writeText(allIds)
-                        .then(() => {
-                            alert('Copied all IDs to clipboard');
-                        })
-                        .catch(err => {
-                            console.error('Error copying text:', err);
-                            alert('Failed to copy IDs');
-                        });
-                });
-
-                outputDiv.appendChild(copyAllButton);
-
-            } catch (error) {
-                console.error('Error fetching posts:', error);
-                document.getElementById('post-ids').innerText = `Error: ${error.message}`;
-            }
         }
-
-        function createFallingHeart() {
-            const heart = document.createElement('div');
-            heart.className = 'heart';
-            heart.style.left = `${Math.random() * 100}vw`;
-            heart.style.animationDuration = `${3 + Math.random() * 2}s`;
-            document.body.appendChild(heart);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 5000);
-        }
-
-        setInterval(createFallingHeart, 300);
-
-        function createMovingCat(position) {
-            const cat = document.createElement('div');
-            cat.className = `cat ${position}`;
-            cat.style.animationDuration = `${5 + Math.random() * 5}s`;
-            document.body.appendChild(cat);
-
-            setTimeout(() => {
-                cat.remove();
-            }, 15000);
-        }
-
-        setInterval(() => createMovingCat('bottom'), 5000);
-        setInterval(() => createMovingCat('top'), 7000);
     </script>
 </body>
 </html>
