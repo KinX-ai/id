@@ -23,6 +23,9 @@
             text-align: center;
             max-width: 400px; /* Điều chỉnh kích thước của container */
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .container h1 {
             margin-bottom: 20px;
@@ -42,6 +45,8 @@
         .input-container {
             margin-bottom: 10px;
             text-align: left;
+            width: 100%;
+            max-width: 300px; /* Điều chỉnh kích thước của các input */
         }
         .input-container label {
             display: block;
@@ -63,6 +68,9 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            width: 100%;
+            max-width: 300px; /* Điều chỉnh kích thước của nút */
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049; /* Màu sắc giống Facebook */
@@ -74,6 +82,10 @@
             border-radius: 5px;
             background-color: #f2f2f2;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            max-height: 200px; /* Chiều cao tối đa của khung cuộn */
+            overflow-y: auto; /* Hiển thị thanh cuộn khi nội dung vượt quá */
+            width: 100%;
+            max-width: 300px; /* Điều chỉnh kích thước của khung cuộn */
         }
         .output p {
             margin: 5px 0;
@@ -86,37 +98,19 @@
             margin-right: 5px;
         }
         .copy-button {
+            display: none; /* Ẩn nút "Copy All" ban đầu */
             background-color: #007bff; /* Màu sắc giống Facebook */
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
-            margin-left: 5px;
+            width: 100%;
+            max-width: 300px; /* Điều chỉnh kích thước của nút */
+            transition: background-color 0.3s;
         }
         .copy-button:hover {
             background-color: #0056b3; /* Màu sắc giống Facebook */
-        }
-
-        /* Heart animation */
-        @keyframes heartFall {
-            0% {
-                transform: translateY(-10vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(110vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .heart {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #ff6384;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            animation: heartFall 6s linear infinite;
         }
 
         /* Popup notification */
@@ -125,7 +119,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(to right, #ffac81, #ff928b);
+            background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -142,7 +136,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Get Facebook Post ID</h1>
+        <h1 id="dynamic-text">Get Facebook Post ID</h1>
         
         <div class="input-container">
             <label for="access-token">Access Token:</label>
@@ -161,35 +155,58 @@
         
         <button onclick="getFacebookPostIds()">Get Post IDs</button>
         
+        <!-- Button to copy all IDs -->
+        <button onclick="copyAllPostIds()" class="copy-button">Copy All</button>
+        
         <div id="post-ids" class="output"></div>
     </div>
-
-    <!-- Container for hearts -->
-    <div id="heart-container"></div>
 
     <!-- Popup notification -->
     <div id="popup" class="popup"></div>
 
     <script>
-        // Function to create hearts randomly
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.className = 'heart';
-            heart.style.left = Math.random() * window.innerWidth + 'px';
-            document.getElementById('heart-container').appendChild(heart);
-
-            // Remove heart after animation ends
-            setTimeout(() => {
-                heart.remove();
-            }, 6000); // Adjust to match animation duration
+        // Function to randomly change the text
+        function changeDynamicText() {
+            const texts = [
+                'Chào Mừng Cậu Đã Đến',
+                'Chào Mừng Cậu Đã Đến',
+                'Cảm Ơn Cậu Đã Ở Lại'
+            ];
+            const randomNumber = Math.floor(Math.random() * texts.length);
+            document.getElementById('dynamic-text').textContent = texts[randomNumber];
         }
 
-        // Trigger heart creation periodically
+        // Trigger text change after every 3 seconds
         setInterval(() => {
-            createHeart();
+            changeDynamicText();
         }, 3000); // Adjust interval as needed
 
-        // Trigger heart creation on button click and fetch data
+        // Function to show popup message
+        function showPopup(message) {
+            const popup = document.getElementById('popup');
+            popup.textContent = message;
+            popup.classList.add('show-popup');
+
+            // Hide popup after 3 seconds
+            setTimeout(() => {
+                popup.classList.remove('show-popup');
+            }, 3000);
+        }
+
+        // Function to copy all post IDs
+        function copyAllPostIds() {
+            const postIds = Array.from(document.querySelectorAll('#post-ids p')).map(p => p.textContent).join('\n');
+            navigator.clipboard.writeText(postIds)
+                .then(() => {
+                    showPopup('Coppy Tất Cả  ID Thành Công');
+                })
+                .catch(err => {
+                    console.error('Error copying:', err);
+                    showPopup('Error copying Post IDs. Please try again.');
+                });
+        }
+
+        // Function to fetch Facebook post IDs
         function getFacebookPostIds() {
             const pageId = document.getElementById('page-id').value;
             const limit = document.getElementById('post-limit').value || 10;
@@ -197,11 +214,11 @@
 
             // Validate inputs
             if (!pageId) {
-                alert('Please enter a Page ID');
+                showPopup('Vui lòng nhập ID Page cần lấy');
                 return;
             }
             if (!accessToken) {
-                alert('Please enter an Access Token');
+                showPopup('Vui lòng nhập Token');
                 return;
             }
 
@@ -234,37 +251,16 @@
                         outputDiv.appendChild(p);
                     });
 
-                    // Create "Copy All" button
-                    const copyAllButton = document.createElement('button');
-                    copyAllButton.textContent = 'Copy All';
-                    copyAllButton.className = 'copy-button';
-                    copyAllButton.style.marginTop = '10px';
-                    copyAllButton.addEventListener('click', () => {
-                        const allIds = postIds.join('\n');
-                        navigator.clipboard.writeText(allIds)
-                            .then(() => {
-                                // Show popup notification
-                                const popup = document.getElementById('popup');
-                                popup.textContent = 'Coppy Tất Cả  ID Thành Công';
-                                popup.classList.add('show-popup');
-
-                                // Hide popup after a few seconds
-                                setTimeout(() => {
-                                    popup.classList.remove('show-popup');
-                                }, 3000);
-                            })
-                            .catch(err => {
-                                console.error('Error copying text:', err);
-                                alert('Failed to copy IDs');
-                            });
-                    });
-
-                    outputDiv.appendChild(copyAllButton);
-
+                    // Show "Copy All" button
+                    const copyButton = document.querySelector('.copy-button');
+                    copyButton.style.display = 'block';
+                    // Show success message
+                    showPopup('Lấy Id bài viết thành công');
                 })
                 .catch(error => {
-                    console.error('Error fetching posts:', error);
-                    outputDiv.innerText = `Error: ${error.message}`;
+                    console.error('Error:', error);
+                    // Show error message
+                    showPopup('Lỗi khi tìm nạp ID bài đăng. Vui lòng kiểm tra đầu vào của bạn.');
                 });
         }
     </script>
