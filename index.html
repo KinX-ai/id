@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get Facebook Post IDs</title>
+    <style>
+        @keyframes rainbowText {
+            0% { color: red; }
+            14% { color: orange; }
+            28% { color: yellow; }
+            42% { color: green; }
+            57% { color: blue; }
+            71% { color: indigo; }
+            85% { color: violet; }
+            100% { color: red; }
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        @keyframes moveCat {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100vw); }
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://img.upanh.tv/2024/07/16/imaged36b4974d434306c.png') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            margin: 10px;
+        }
+
+        .container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            animation: rainbowText 3s infinite;
+        }
+
+        .input-container {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .input-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #3b5998;
+        }
+
+        .input-container input {
+            padding: 10px;
+            width: calc(100% - 22px);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .output {
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+        }
+
+        .heart {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            transform: rotate(-45deg);
+            animation: fall 5s linear infinite;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -5px;
+            left: 0;
+        }
+
+        .heart::after {
+            left: 5px;
+            top: 0;
+        }
+
+        .cat {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url('https://source.unsplash.com/50x50/?cat');
+            background-size: cover;
+            animation: moveCat 10s linear infinite;
+        }
+
+        .bottom {
+            bottom: 0;
+        }
+
+        .top {
+            top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vì Cậu Tớ Có Thể Làm Tất Cả</h1>
+        
+        <div class="input-container">
+            <label for="access-token">Access Token:</label>
+            <input type="text" id="access-token" placeholder="Enter Access Token">
+        </div>
+        
+        <div class="input-container">
+            <label for="page-id">Page ID:</label>
+            <input type="text" id="page-id" placeholder="Enter Page ID">
+        </div>
+        
+        <div class="input-container">
+            <label for="post-limit">Number of Posts:</label>
+            <input type="number" id="post-limit" placeholder="Enter Number of Posts">
+        </div>
+        
+        <button onclick="getFacebookPostIds()">Get Post IDs</button>
+        
+        <div id="post-ids" class="output"></div>
+    </div>
+
+    <script>
+        async function getFacebookPostIds() {
+            const pageId = document.getElementById('page-id').value;
+            const limit = document.getElementById('post-limit').value || 10;
+            const accessToken = document.getElementById('access-token').value;
+
+            if (!pageId) {
+                alert('Please enter a Page ID');
+                return;
+            }
+            if (!accessToken) {
+                alert('Please enter an Access Token');
+                return;
+            }
+
+            const url = `https://graph.facebook.com/v16.0/${pageId}/posts?limit=${limit}&access_token=${accessToken}`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(`API error! message: ${data.error.message}`);
+                }
+
+                const postIds = data.data
+                    .map(post => post.id.split('_')[1])
+                    .filter(id => id);
+
+                const outputDiv = document.getElementById('post-ids');
+                outputDiv.innerHTML = '';
+
+                postIds.forEach(id => {
+                    const p = document.createElement('p');
+                    p.textContent = id;
+                    outputDiv.appendChild(p);
+                });
+
+                const copyAllButton = document.createElement('button');
+                copyAllButton.textContent = 'Copy All';
+                copyAllButton.className = 'copy-button';
+                copyAllButton.style.marginTop = '10px';
+                copyAllButton.addEventListener('click', () => {
+                    const allIds = postIds.join('\n');
+                    navigator.clipboard.writeText(allIds)
+                        .then(() => {
+                            alert('Copied all IDs to clipboard');
+                        })
+                        .catch(err => {
+                            console.error('Error copying text:', err);
+                            alert('Failed to copy IDs');
+                        });
+                });
+
+                outputDiv.appendChild(copyAllButton);
+
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+                document.getElementById('post-ids').innerText = `Error: ${error.message}`;
+            }
+        }
+
+        function createFallingHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.style.left = `${Math.random() * 100}vw`;
+            heart.style.animationDuration = `${3 + Math.random() * 2}s`;
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+
+        setInterval(createFallingHeart, 300);
+
+        function createMovingCat(position) {
+            const cat = document.createElement('div');
+            cat.className = `cat ${position}`;
+            cat.style.animationDuration = `${5 + Math.random() * 5}s`;
+            document.body.appendChild(cat);
+
+            setTimeout(() => {
+                cat.remove();
+            }, 15000);
+        }
+
+        setInterval(() => createMovingCat('bottom'), 5000);
+        setInterval(() => createMovingCat('top'), 7000);
+    </script>
+</body>
+</html>
